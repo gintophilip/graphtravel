@@ -79,6 +79,13 @@ class Node{
     public Node(String operationName) {
         this.operationName = operationName;
     }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "operationName='" + operationName + '\'' +
+                '}';
+    }
 }
  class Driver{
     public static void main(String[] args) {
