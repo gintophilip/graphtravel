@@ -16,7 +16,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR LGPL-2.1-or-later
  */
 
-        import org.jgrapht.*;
+        import org.jgrapht.Graph;
         import org.jgrapht.graph.*;
         import org.jgrapht.nio.*;
         import org.jgrapht.nio.dot.*;
@@ -54,7 +54,7 @@ public final class HelloJGraphT
 
         // note undirected edges are printed as: {<v1>,<v2>}
         System.out.println("-- toString output");
-        System.out.println(stringGraph.toString());
+        System.out.println(stringGraph);
         System.out.println();
 
 
@@ -141,7 +141,7 @@ public final class HelloJGraphT
         });
         Writer writer = new StringWriter();
         exporter.exportGraph(hrefGraph, writer);
-        System.out.println(writer.toString());
+        System.out.println(writer);
     }
 
     /**

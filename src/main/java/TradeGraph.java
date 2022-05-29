@@ -7,95 +7,106 @@ import java.util.List;
 import java.util.Set;
 
 public class TradeGraph {
-    Graph<Node, PathIdentifier> graph = new SimpleGraph<>(PathIdentifier.class);
+    //graph with custom Edge as PathIdentifier
+  final  Graph<Vertex, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
+    List<DefaultEdge> edges;
+    List<DefaultEdge> visited=new ArrayList<>();
+    void createGraph() {
+//        create vertexes
+        Vertex vertex1 = new Vertex("node-1");
+        Vertex vertex2 = new Vertex("node-2");
+        Vertex vertex3 = new Vertex("node-3");
+        Vertex vertex4 = new Vertex("node-4");
+        Vertex vertex5 = new Vertex("node-5");
+//add vertexex to graph
+        graph.addVertex(vertex1);
+        graph.addVertex(vertex2);
+        graph.addVertex(vertex3);
+        graph.addVertex(vertex4);
+        graph.addVertex(vertex5);
 
-    void  creategraph(){
-       Node node1=new Node("node1");
-       Node node2= new Node("node2");
-       Node node3= new Node("node3");
-       Node node4= new Node("node4");
-       Node node5= new Node("node5");
-
-       graph.addVertex(node1);
-       graph.addVertex(node2);
-       graph.addVertex(node3);
-       graph.addVertex(node4);
-       graph.addVertex(node5);
-
-       graph.addEdge(node1,node2,new PathIdentifier("not-travelled"));
-       graph.addEdge(node1,node3,new PathIdentifier("not-travelled"));
-       graph.addEdge(node2,node4,new PathIdentifier("not-travelled"));
-       graph.addEdge(node2,node5,new PathIdentifier("not-travelled"));
-       graph.addEdge(node3,node5,new PathIdentifier("not-travelled"));
-       graph.addEdge(node5,node4,new PathIdentifier("not-travelled"));
-
+        //connect vertexes thriugh edges
+        graph.addEdge(vertex1, vertex2);
+        graph.addEdge(vertex1, vertex3);
+        graph.addEdge(vertex2, vertex4);
+        graph.addEdge(vertex2, vertex5);
+        graph.addEdge(vertex3, vertex5);
+        graph.addEdge(vertex5, vertex4);
+edges=new ArrayList<>(graph.edgeSet());
     }
-void begintravel(Node[] nodes){
-        // n1 n2 n5
-       Set<Node> vertexset= graph.vertexSet();
-       //node for trade1
-    Node[] nodes1=new Node[nodes.length];
-    List<PathIdentifier> edgelist=new ArrayList<>();
-    for(int i=0;i<nodes.length-1;i++){
-        Set<PathIdentifier> p= graph.getAllEdges(nodes[i],nodes[i+1]);
-        for(PathIdentifier p1:p){
-            p1.label="travelled";
+
+    // method to travel through vertexes . vertex is given in an array
+    void begintravel(Vertex[] vertices) {
+        for (int i = 0; i < vertices.length - 1; i++) {
+            //get edges of two vertexes
+            Set<DefaultEdge> edges = graph.getAllEdges(vertices[i], vertices[i + 1]);
+            for (DefaultEdge p1 : edges) {
+                //change edge labe to travelled to indicate that the given path is travelled
+                Vertex v1 = graph.getEdgeSource(p1);
+                Vertex v2 = graph.getEdgeTarget(p1);
+                visited.add(p1);
+            }
         }
+      //  printPath();
     }
-    printgraph();
-}
-
-    private void printgraph() {
-for(PathIdentifier p:graph.edgeSet()){
-    Node n1=graph.getEdgeSource(p);
-    Node n2=graph.getEdgeTarget(p);
-   // if(p.label.equalsIgnoreCase("travelled")){
-        System.out.println(n1.operationName+" "+p.label+" "+n2.operationName);
-  //  }else{
-     //   System.out.println(n1.operationName+" "+p.label+" "+n2.operationName);
+    public Set<Vertex> getVertexes() {
+        return graph.vertexSet();
+    }
+    void getTravelledPaths(){
+        System.out.println("******************Travelled Paths**************************");
+        for (DefaultEdge edge : visited) {
+            Vertex v1 = graph.getEdgeSource(edge);
+            Vertex v2 = graph.getEdgeTarget(edge);
+            System.out.println(v1.operationName + " travelled-to " + v2.operationName+"\n----------");
+        }
+        System.out.println("****************************************\n");
 
     }
-}
-
-    public Set<Node> getVertexes() {
-      return  graph.vertexSet();
+    void getNotTravelledPaths(){
+        System.out.println("************Paths Not Travelled**********************");
+        List<DefaultEdge> notTravelled= edges.stream().filter(elem -> !visited.contains(elem)).toList();
+        for (DefaultEdge edge : notTravelled) {
+            Vertex v1 = graph.getEdgeSource(edge);
+            Vertex v2 = graph.getEdgeTarget(edge);
+            System.out.println(v1.operationName + " not-travelled-to " + v2.operationName+"\n----------");
+        }
+        System.out.println("******************************************");
     }
 }
-class PathIdentifier extends DefaultEdge{
+// custom edge class
+class CustomEdge1 extends DefaultEdge {
     String label;
 
-    public PathIdentifier(String label) {
+    public CustomEdge1(String label) {
         this.label = label;
     }
 
 
 }
-class Node{
-    String operationName="";
 
-    public Node() {
+class Vertex {
+    String operationName = "";
+
+    public Vertex() {
     }
 
-    public Node(String operationName) {
+    public Vertex(String operationName) {
         this.operationName = operationName;
     }
 
-    @Override
-    public String toString() {
-        return "Node{" +
-                "operationName='" + operationName + '\'' +
-                '}';
-    }
 }
- class Driver{
+
+class Main {
     public static void main(String[] args) {
-        TradeGraph tg=new TradeGraph();
-        tg.creategraph();
-       List<Node> nodelist=new ArrayList<Node>(tg.getVertexes());
-       for(Node elem:nodelist){
-           System.out.println(elem.operationName);
-       }
-       Node[] nodearray={nodelist.get(0),nodelist.get(1),nodelist.get(4)};
-        tg.begintravel(nodearray);
+        TradeGraph tg = new TradeGraph();
+        tg.createGraph();
+        List<Vertex> vertexList = new ArrayList<>(tg.getVertexes());
+        Vertex[] vertexesToTravel = {vertexList.get(0), vertexList.get(2), vertexList.get(4)};
+        tg.begintravel(vertexesToTravel);
+
+        tg.getTravelledPaths();//get travelled paths
+
+        tg.getNotTravelledPaths(); //get paths not travelled
     }
 }
+//this class records the transactions
